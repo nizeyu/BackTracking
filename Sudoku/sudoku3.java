@@ -1,6 +1,8 @@
 package sudoku;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
@@ -9,19 +11,19 @@ import java.util.Stack;
 import java.util.Vector;
 
 public class sudoku3 {
-	private final int NORMS = 9; //数独规模：9 X 9
-	private final int MAX_SOLUTIONS = 10000; //解到10000个就不解了
-	private int[][] sudoku = new int[NORMS][NORMS]; //存放数独数据的矩阵
-	private int[][] sudoku_copy = new int[NORMS][NORMS]; //一个拷贝，用于算法实现中的一个辅助矩阵
-	private SudokuSolution solutions = new SudokuSolution(); //存放解
-	private int[][][] ctbl; //存放候选数字的矩阵
+	private final int NORMS = 9; //sudoku：9 X 9
+	private final int MAX_SOLUTIONS = 10000; //if solutions==1000, end
+	private int[][] sudoku = new int[NORMS][NORMS]; //sudoku array
+	private int[][] sudoku_copy = new int[NORMS][NORMS]; //Tempt save
+	private SudokuSolution solutions = new SudokuSolution(); //solutions
+	private int[][][] ctbl; //Candidate array
 	
-	//枚举：简单、中等、困难三个游戏难易程度
+	//Three DifficultyLevel
 	public enum DifficultyLevel {
 		EASY, MEDIUM, HARD
 	} // end enumeration DifficultyLevel
 
-	//生成一个完整数独
+	//generate a complete Sudoku
 	public void generateSudoku() {
 		while (!generate()) {
 
@@ -29,7 +31,7 @@ public class sudoku3 {
 		SudokuSolution.copySudoku(sudoku, sudoku_copy);
 	} // end method generateSudoku
 	
-	//从生成的完整数独中挖取格子以实现生成一个数独游戏
+	//remove cells from the complete sudoku
 	public void newSudokuGame(DifficultyLevel level) {
 		generateSudoku();
 		int nRemove = 0;
@@ -57,12 +59,12 @@ public class sudoku3 {
 		System.out.println();
 	} // end method newSudokuGame
 
-	//用户输入数独问题
-	public void inputSudokuGame() {
-		Scanner scanner = new Scanner(System.in);
+	//User input sudoku
+	public void inputSudokuGame() throws FileNotFoundException {
+		Scanner input = new Scanner(new FileReader("input.dat"));
 		for (int row = 0; row < NORMS; row++) {
 			for (int col = 0; col < NORMS; col++) {
-				sudoku[row][col] = scanner.nextInt();
+				sudoku[row][col] = input.nextInt();
 				sudoku_copy[row][col] = sudoku[row][col];
 			}
 		}
@@ -70,7 +72,7 @@ public class sudoku3 {
 		printSudoku(false);
 	} // end method inputSudoku
 	
-	//打印数独
+	//Print array
 	public void printSudoku(boolean sparse) {
 		for (int row = 0; row < NORMS; row++) {
 			for (int col = 0; col < NORMS; col++) {
@@ -83,7 +85,7 @@ public class sudoku3 {
 		}
 	}// end method printSudoku
 
-	//保存数独到txt文件中
+	//Save to .txt file
 	public void saveSudoku() {
 		String filename = "";
 		File file = null;
@@ -116,7 +118,7 @@ public class sudoku3 {
 		}// end try-catch-finally block
 	}// end method saveSudoku
 	
-	//求解数独问题
+	//sudoku solve
 	public int solveSudoku() {
 		solutions.clearSolutions();
 		int count = 0;
@@ -131,36 +133,36 @@ public class sudoku3 {
 					count++;
 				}
 			}
-		}// end for: 初始化所有的候选数字
+		}// end for: initialize all candiate number
 		while (true) {
 			unique = false;
 			for (int col = 0; col < NORMS; col++) {
 				for (int row = 0; row < NORMS; row++) {
 					if (1 == constraintSize(ctbl[row][col])) {
-						sudoku_copy[row][col] = ctbl[row][col][0]; //同步sudoku_copy
+						sudoku_copy[row][col] = ctbl[row][col][0]; //save to sudoku_copy
 						setCell(row, col, ctbl[row][col][0]);
 						count--;
 						unique = true;
-					}// 如果格子只有一个候选数字就填入
+					}// if cell just have one candiate then put in
 				}// end for
 			}// end for
 			if (0 == count) {
 				solutions.addSolution(sudoku);
 				break;
-			}// 如果所有的格子填完了，那么说明这个数独问题是一个数度难题，也就是只有一个解，返回就可以了
+			}// If all the cell has been fill ,return this one solution,because this is a very hard sudoku
 			if (unique == false) {
 				return multipleSolutions(count);
-			}// end if: 调用回溯法求解数独问题
+			}// end if: call backtracking method
 		}// end while
 		return 1;
 	}// end method solveSudoku
 
-	//打印数独问题的解
+	//Print the solution of sudoko
 	public void printSudokuSolutions() {		
 		solutions.printSolutions();
 	} // end method printSudokuSolutions
 
-	//生成数独的一个循环
+	//generate sudoku
 	private boolean generate() {
 		int[] constraint = new int[10];
 		resetSudoku();
@@ -176,15 +178,15 @@ public class sudoku3 {
 		return true;
 	} // end method generate
 
-	//回溯法求解数独问题
+	//Backtracking
 	private int multipleSolutions(int count) {
-		//count 是待填的格子的总数量
+		//count Total number of free cell
 		Stack<Integer> s = new Stack<Integer>();
-		int results = 0; //求得的解数量
-		int reach = 0; //记录已经填写的格子数
+		int results = 0; //Number of solution
+		int reach = 0; //how many cell have been fill
 		int row = 0;
 		int col = 0;
-		int next = -1; //待填候选数字在排序中的序号
+		int next = -1; //order of the candidate
 //		System.out.println("After first step resolving:");
 //		printSudoku(false);
 //		System.out.println();
@@ -198,7 +200,7 @@ public class sudoku3 {
 					if (s.isEmpty() || results == MAX_SOLUTIONS) {
 						return results;
 					}
-					//回溯
+					//backtracking
 					next = s.pop() + 1;
 					do {
 						row--;
@@ -208,7 +210,7 @@ public class sudoku3 {
 						}
 					} while (0 != sudoku_copy[row][col]);
 					sudoku[row][col] = 0;
-					//更新候选数字
+					//update the candiate
 					updateAllConstraints();
 					reach--;
 				}
@@ -218,15 +220,15 @@ public class sudoku3 {
 				next = -1;
 			} 
 			if (reach == count) {
-				//求得一个解
+				//find a solution
 				results++;
 				solutions.addSolution(sudoku);
 				
-				//回溯
+				//backtracking
 				next = s.pop() + 1;
 				sudoku[row][col] = 0;
 				reach--;
-				//更新候选数字
+				//update the candiate
 				updateAllConstraints();
 				row--;
 			}
@@ -238,13 +240,13 @@ public class sudoku3 {
 		} // end while
 	}// end method multipleSolutions
 
-	// 设置格子sudoku[row][col]候选数字 val, 并局部更新候选数字（同行、同列、同块）
+	// set the candiate of sudoku[row][col] be val, then partly update the number（same row, same col, same 9 cell）
 	private void setCell(int row, int col, int val) {
 		sudoku[row][col] = val;
 		updateConstraints(row, col, val);
 	}// end method setCell
 
-	//获取sudoku[row][col]的候选数字存入constraint数组中
+	//get candiate of sudoku[row][col],and put in the array of constraint
 	private void getConstraint(int col, int row, int[] constraint,
 			boolean allIter) {
 		int[] cc = new int[10];
@@ -291,7 +293,7 @@ public class sudoku3 {
 
 	}// end method getConstraint
 
-	//更新所有的格子的候选数字
+	//update the candiate of all cell
 	private void updateAllConstraints() {
 		for (int col = 0; col < NORMS; col++) {
 			for (int row = 0; row < NORMS; row++) {
@@ -302,7 +304,7 @@ public class sudoku3 {
 		}// end for
 	}// end method updateAllConstraints
 
-	//更新sudoku[row][col]的候选数字，去掉val
+	//update the candiate of sudoku[row][col]and delete val
 	private void updateConstraints(int row, int col, int val) {
 		int len;
 		boolean shouldMove;
@@ -353,7 +355,7 @@ public class sudoku3 {
 			// block
 	}// end method updateConstraints
 
-	//从候选数字数组constraint中获取一个随机的候选数字
+	//get a random number form the array of constraint
 	private int randomCandidate(int[] constraint) {
 		int len = constraintSize(constraint);
 		Random r = new Random();
@@ -361,7 +363,7 @@ public class sudoku3 {
 		return constraint[result];
 	}// end method randomCandidate
 
-	//根据sudoku_copy重置数独
+	//reset sudoku according to the array of sudoku_copy
 	private void resetSudoku() {
 		for (int row = 0; row < NORMS; row++) {
 			for (int col = 0; col < NORMS; col++) {
@@ -370,7 +372,7 @@ public class sudoku3 {
 		}// end for
 	}// end method resetSudoku
 
-	//获取候选数字数组的大小
+	//get the range of candiate array
 	private int constraintSize(int[] constraint) {
 		int len = 0;
 		for (int i = 0; i < 10; i++) {
@@ -382,7 +384,7 @@ public class sudoku3 {
 		return len;
 	}// end method constraintSize
 
-	//打印sudoku，在调试的时候用到
+	//print sudoku
 	private void printSudoku(int[][] sudoku) {
 
 		for (int row = 0; row < NORMS; row++) {
@@ -394,7 +396,7 @@ public class sudoku3 {
 
 	}
 
-	//打印一个一维数组，调试的时候用到
+	//print array
 	private void printArray(int[] array, String description) {
 		System.out.print(description + ": ");
 		for (int i = 0; i < array.length; i++) {
@@ -404,7 +406,7 @@ public class sudoku3 {
 	}// end method printArray: for test, print a 1-d vector(array)
 }// end class test
 
-//一个类表示数独问题的解，主要是一个Vector容器存放数独问题的解
+//Vector to store the solution of sudoku
 class SudokuSolution {
 	private static final int NORMS = 9;
 
@@ -431,7 +433,7 @@ class SudokuSolution {
 		Solutions.clear();
 	}
 
-	//打印所有的解
+	//Print all the solution
 	void printSolutions() {
 		int[][] solution;
 		for (int i = 0; i < Solutions.size(); i++) {
@@ -446,7 +448,7 @@ class SudokuSolution {
 		}// end for
 	}// end method printSolutions
 
-	//一个静态的拷贝之间拷贝数据的方法
+	//copy mehtod
 	static void copySudoku(int[][] src, int[][] dest) {
 		for (int row = 0; row < NORMS; row++) {
 			for (int col = 0; col < NORMS; col++) {
