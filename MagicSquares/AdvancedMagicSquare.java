@@ -22,17 +22,69 @@ public class AdvancedMagicSquare{
 		//permute(0);//permute from 0
 	}//end constructor
 	
-	private boolean condition(int testIndex){
+	public static void main(String[] a) throws Exception{
+		System.out.println("Magic Square Working.");
+		AdvancedMagicSquare magic = new AdvancedMagicSquare(4);
+		
+		long t0 = System.currentTimeMillis();
+		magic.permute(0);
+		long t1 = System.currentTimeMillis();
+		System.out.println(magic.count);
+		
+		System.out.println("The time cost is: " + (t1-t0));
+		
+	}//end main
+	
+	/** 
+	* FunName: permute 
+	* Description: the main function to solve magic square problem based on backtracking.
+	*              it can call checking function and if it satisfy with checking function, 
+	*              it can recursive to next state. If not, it can backtracking to earlier state 
+	*              based on DFS.           
+	* @param: int testIndex //A index to traversing the result array.
+	* @return: void  
+	* @Author: Zeyu Ni, Binglin Xie, Yingbin Zheng / CS-593-B / Final Project
+	* @Create Date: 4/10/2016 
+	*/ 
+	private void permute(int testIndex){
+		if(testIndex == maxNum){//Get one solution
+				//print();//print the result square
+				count++;//count for the solution
+		}else{
+			for(int i = 1; i <= maxNum; i++){//travsing all the number set
+				m[testIndex] = i;//try each number
+				if(checking(testIndex)){//call checking function
+					permute(testIndex + 1);//recursive to next state
+				}
+			}
+		}
+	}//end permute(int j)
+	
+	/** 
+	* FunName: checking 
+	* Description: the checking function to judge validity for current attempt 
+	*              and if it meet all the conditions, return true; otherwise, reture false.
+	*              These checking funtion primarily include:
+	*              1. Check Number Repetition
+	*              2. Check Row, column, main/minor diagonal sum
+	*              3. Check Row, column, main/minor diagonal for the first several numbers
+	*                 to avoid too small or too large        
+	* @param: int testIndex //A index to traversing the result array.
+	* @return: boolean  
+	* @Author: Zeyu Ni, Binglin Xie, Yingbin Zheng / CS-593-B / Final Project
+	* @Create Date: 4/10/2016 
+	*/ 
+	private boolean checking(int testIndex){
 		int remainder = testIndex % order;//remainder for testIndex corresponding cols
 		int quotient = testIndex / order;//quotient for testIndex corresponding rows
 		
 		/**
 		 * Section1: Check Number Repetition
 		 * Description:check and not allow has the same number before
-		 * @author Zeyu Ni/Student ID:10410962/CPE-593-B
+		 * @Author: Zeyu Ni, Binglin Xie, Yingbin Zheng / CS-593-B / Final Project
 		 * @Create Date:: 4/10/2016
 		 */
-		for(int i = 0; i < testIndex; i++){ //O(n^2)
+		for(int i = 0; i < testIndex; i++){ //
 			if(m[testIndex] == m[i]){
 				return false;
 			}	
@@ -42,7 +94,7 @@ public class AdvancedMagicSquare{
 		 * Section2: Check Row Sum
 		 * Description: check the last one in the row, if row sum != Magic_Constant,
 		 *              return false.
-		 * @author Zeyu Ni/Student ID:10410962/CPE-593-B
+		 * @Author: Zeyu Ni, Binglin Xie, Yingbin Zheng / CS-593-B / Final Project
 		 * @Create Date:: 4/10/2016
 		 */
 		if(remainder == order - 1){//last one in the row sum = Magic_Constant
@@ -59,7 +111,7 @@ public class AdvancedMagicSquare{
 		 * Section3: Check Column Sum
 		 * Description: check the last one in the column, if row sum != Magic_Constant,
 		 *              return false.
-		 * @author Zeyu Ni/Student ID:10410962/CPE-593-B
+		 * @Author: Zeyu Ni, Binglin Xie, Yingbin Zheng / CS-593-B / Final Project
 		 * @Create Date:: 4/15/2016
 		 */
 		if(testIndex >= maxNum - order){//last one in the column sum = Magic_Constant
@@ -78,7 +130,7 @@ public class AdvancedMagicSquare{
 		 * Section4: Check main diagonal sum
 		 * Description: check the last one in the main diagonal, if main diagonal sum != Magic_Constant,
 		 *              return false.
-		 * @author Zeyu Ni/Student ID:10410962/CPE-593-B
+		 * @Author: Zeyu Ni, Binglin Xie, Yingbin Zheng / CS-593-B / Final Project
 		 * @Create Date:: 4/17/2016
 		 */
 		if(testIndex == maxNum - 1){///last one in the main diagonal sum = Magic_Constant
@@ -88,8 +140,7 @@ public class AdvancedMagicSquare{
 					if(j  %  order == i){
 						sum += m[j];
 					}
-				}
-				
+				}	
 			}
 			if(sum != Magic_Constant){
 				return false;
@@ -100,7 +151,7 @@ public class AdvancedMagicSquare{
 		 * Section5: Check minor diagonal sum
 		 * Description: check the last one in the minor diagonal, if minor diagonal sum != Magic_Constant,
 		 *              return false.
-		 * @author Zeyu Ni/Student ID:10410962/CPE-593-B
+		 * @Author: Zeyu Ni, Binglin Xie, Yingbin Zheng / CS-593-B / Final Project
 		 * @Create Date:: 4/17/2016
 		 */
 		if(testIndex == maxNum - order){///last one in the minor diagonal sum = Magic_Constant
@@ -118,17 +169,19 @@ public class AdvancedMagicSquare{
 		}
 		
 		/**
-		 * Section6: Check Row too small for fisrt serveral numbers 
-		 * Description: check if the fisrt serveral numbers in a row too small 
+		 * Section6: Check Row too small or too big for first several numbers 
+		 * Description: check if the first several numbers in a row too small or too big 
 		 *              return false.
-		 * @author Zeyu Ni/Student ID:10410962/CPE-593-B
+		 * @Author: Zeyu Ni, Binglin Xie, Yingbin Zheng / CS-593-B / Final Project
 		 * @Create Date:: 4/19/2016
 		 */
 		if(remainder > 0 && remainder != order - 1){
+			//calculate the sum of passed numbers in the row
 			int rowSum = 0;
 			for(int i = testIndex - remainder; i <= testIndex; i++){
 				rowSum += m[i];
 			}
+			//judge the rowSum whether too small
 			int bigNum = maxNum;
 			int bigNumSum = 0;
 			for(int j = 0; j < order - remainder - 1; j++){
@@ -138,20 +191,7 @@ public class AdvancedMagicSquare{
 			if(rowSum < Magic_Constant - bigNumSum){
 				return false;
 			}
-		}
-		
-		/**
-		 * Section7: Check Row too big for fisrt serveral numbers 
-		 * Description: check if the fisrt serveral numbers in a row too big
-		 *              return false.
-		 * @author Zeyu Ni/Student ID:10410962/CPE-593-B
-		 * @Create Date:: 4/19/2016
-		 */
-		if(remainder > 0 && remainder != order - 1){
-			int rowSum = 0;
-			for(int i = testIndex - remainder; i <= testIndex; i++){
-				rowSum += m[i];
-			}
+			//judge the rowSum whether too big
 			int smallNum = 1;
 			int smallNumSum = 0;
 			for(int j = 0; j < order - remainder - 1; j++){
@@ -162,21 +202,23 @@ public class AdvancedMagicSquare{
 				return false;
 			}
 		}
-		
+				
 		/**
-		 * Section8: Check Column too big for fisrt serveral numbers 
-		 * Description: check if the fisrt serveral numbers in a column too big
+		 * Section7: Check Column too small or too big for first several numbers 
+		 * Description: check if the first several numbers in a column too small or too big
 		 *              return false.
-		 * @author Zeyu Ni/Student ID:10410962/CPE-593-B
+		 * @Author: Zeyu Ni, Binglin Xie, Yingbin Zheng / CS-593-B / Final Project
 		 * @Create Date:: 4/21/2016
 		 */
 		if(testIndex >= order){
+			//calculate the sum of passed numbers in the column
 			int colSum = 0;
 			for(int i = 0; i <= testIndex; i++){
 				if(i % order == remainder){
 					colSum += m[i];
 				}	
 			}
+			//judge the colSum whether too small
 			int bigNum = maxNum;
 			int bigNumSum = 0;
 			for(int j = 0; j < order - quotient - 1; j++){
@@ -186,26 +228,20 @@ public class AdvancedMagicSquare{
 			if(colSum < Magic_Constant - bigNumSum){
 				return false;
 			}
-		}
-		
-		
-
-		return true;//if all conditions pass, return ture
-	}//end consistent(int j)
-	
-	private void test(int j){
-		if(j == maxNum){
-				//print();
-				count++;
-		}else{
-			for(int i = 1; i <= maxNum; i++){
-				m[j] = i;
-				if(condition(j)){
-					test(j + 1);
-				}	
+			//judge the colSum whether too big
+			int smallNum = 1;
+			int smallNumSum = 0;
+			for(int j = 0; j < order - quotient - 1; j++){
+				smallNumSum += smallNum;
+				smallNum++;
+			}
+			if(colSum > Magic_Constant - smallNumSum){
+				return false;
 			}
 		}
-	}//end permute(int j)
+				
+		return true;//if all conditions pass, return ture
+	}//end consistent(int j)
 	
 	/** 
 	* FunName: print1 
@@ -226,16 +262,5 @@ public class AdvancedMagicSquare{
 		System.out.println();
 	}//end print()
 	
-	public static void main(String[] a) throws Exception{
-		System.out.println("Magic Square Working.");
-		AdvancedMagicSquare magic = new AdvancedMagicSquare(4);
-		
-		long t0 = System.currentTimeMillis();
-		magic.test(0);
-		long t1 = System.currentTimeMillis();
-		System.out.println(magic.count);
-		
-		System.out.println("The time cost is: " + (t1-t0));
-		
-	}//end main
+	
 }//end class MagicSquare
