@@ -4,6 +4,9 @@ Team Members: Binglin Xie, Zeyu Ni, Yingbin Zheng
 Instructor: Professor Dov Kruger
 3/29/2016-5/10/2016
 -----------------------------------------------------------------
+Project Description:
+We develop highly efficient solutions based on backtracking for Magic Squares, n-queens, and sudoku. We focus on improving the efficiency of Algorithm by skipping illeagal solutions. Testing and evaluation can be conducted to evaluate the performance of backtracking Algorithm. 
+
 Steps to run this program:
 1.Please download the "Backtracking-FinalVersion" folder.
 2.Please import the "Backtracking-FinalVersion" folder into Eclipse .
