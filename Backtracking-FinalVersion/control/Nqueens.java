@@ -8,13 +8,7 @@ public class Nqueens {
 //     int N;
     
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		//long start = System.nanoTime();
-	    //time consuming code here.
-	    //...
-	   // long end = System.nanoTime();
-//	    long used = end-start;
-//	    System.out.println("used:"+TimeUnit.NANOSECONDS.toMillis(used)+" ms");
+
     
   // System.out.println("Enter the number of queens");
 		//Scanner reader = new Scanner(System.in);
